@@ -32,12 +32,23 @@ class MainActivity : AppCompatActivity() {
         val openAccessibilityButton = findViewById<Button>(R.id.openAccessibilityButton)
 
         runningSwitch.isChecked = preferences.isRunning()
-        when (preferences.getIntervalMs()) {
-            1000L -> intervalGroup.check(R.id.interval1s)
-            5000L -> intervalGroup.check(R.id.interval5s)
-            10000L -> intervalGroup.check(R.id.interval10s)
-            30000L -> intervalGroup.check(R.id.interval30s)
-            else -> intervalGroup.check(R.id.interval5s)
+        when (val optionId = preferences.getIntervalOptionId()) {
+            R.id.interval5s,
+            R.id.interval10s,
+            R.id.interval30s,
+            R.id.interval60s,
+            R.id.interval1m,
+            R.id.interval1m30s -> intervalGroup.check(optionId)
+            else -> {
+                when (preferences.getIntervalMs()) {
+                    5000L -> intervalGroup.check(R.id.interval5s)
+                    10000L -> intervalGroup.check(R.id.interval10s)
+                    30000L -> intervalGroup.check(R.id.interval30s)
+                    60000L -> intervalGroup.check(R.id.interval60s)
+                    90000L -> intervalGroup.check(R.id.interval1m30s)
+                    else -> intervalGroup.check(R.id.interval5s)
+                }
+            }
         }
 
         fun refreshUi() {
@@ -59,13 +70,16 @@ class MainActivity : AppCompatActivity() {
 
         intervalGroup.setOnCheckedChangeListener { _, checkedId ->
             val interval = when (checkedId) {
-                R.id.interval1s -> 1000L
                 R.id.interval5s -> 5000L
                 R.id.interval10s -> 10000L
                 R.id.interval30s -> 30000L
+                R.id.interval60s -> 60000L
+                R.id.interval1m -> 60000L
+                R.id.interval1m30s -> 90000L
                 else -> 5000L
             }
             preferences.setIntervalMs(interval)
+            preferences.setIntervalOptionId(checkedId)
         }
 
         savePointButton.setOnClickListener {
