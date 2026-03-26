@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AutoClick Android</string>
+    <string name="status_running">AutoClick ativo</string>
+    <string name="status_stopped">AutoClick parado</string>
+    <string name="point_dynamic">Usando posição dinâmica do toque</string>
+    <string name="tap_instruction">Toque em qualquer ponto da tela para salvar a posição fixa.</string>
+    <string name="enable_accessibility_hint">Ative o serviço de acessibilidade para funcionar.</string>
+    <string name="accessibility_service_description">Executa toques automáticos com intervalo configurável.</string>
+    <string name="accessibility_service_summary">Serviço necessário para autoclick</string>
+</resources>
