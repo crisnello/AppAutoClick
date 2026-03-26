@@ -42,12 +42,6 @@
         android:orientation="horizontal">
 
         <RadioButton
-            android:id="@+id/interval1s"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1s" />
-
-        <RadioButton
             android:id="@+id/interval5s"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -64,6 +58,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="30s" />
+
+        <RadioButton
+            android:id="@+id/interval60s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="60s" />
+
+        <RadioButton
+            android:id="@+id/interval1m"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1m" />
+
+        <RadioButton
+            android:id="@+id/interval1m30s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1m30s" />
     </RadioGroup>
 
     <TextView
