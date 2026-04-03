@@ -79,25 +79,39 @@
     </RadioGroup>
 
     <TextView
-        android:id="@+id/fixedPointText"
+        android:id="@+id/primaryPointText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Posição dinâmica" />
+        android:text="Posição 1 não definida" />
 
     <Button
-        android:id="@+id/savePointButton"
+        android:id="@+id/savePrimaryPointButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Salvar próximo toque como ponto fixo" />
+        android:text="Salvar posição 1" />
+
+    <TextView
+        android:id="@+id/secondaryPointText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Posição 2 não definida (opcional)" />
 
     <Button
-        android:id="@+id/clearPointButton"
+        android:id="@+id/saveSecondaryPointButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Usar posição dinâmica" />
+        android:text="Salvar posição 2" />
+
+    <Button
+        android:id="@+id/clearPointsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Limpar posições salvas" />
 
     <Button
         android:id="@+id/openAccessibilityButton"
