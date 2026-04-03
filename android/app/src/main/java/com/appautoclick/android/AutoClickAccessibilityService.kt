@@ -10,11 +10,22 @@ import android.view.accessibility.AccessibilityEvent
 class AutoClickAccessibilityService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var preferences: AutoClickPreferences
+    private var clickPrimaryNext: Boolean = true
 
     private val clickRunnable = object : Runnable {
         override fun run() {
             if (!preferences.isRunning()) return
-            val point = preferences.getClickPoint() ?: DEFAULT_POINT
+            val primaryPoint = preferences.getPrimaryClickPoint() ?: DEFAULT_POINT
+            val secondaryPoint = preferences.getSecondaryClickPoint()
+            val point = if (secondaryPoint == null) {
+                primaryPoint
+            } else if (clickPrimaryNext) {
+                clickPrimaryNext = false
+                primaryPoint
+            } else {
+                clickPrimaryNext = true
+                secondaryPoint
+            }
             performTap(point.first, point.second)
             handler.postDelayed(this, preferences.getIntervalMs())
         }
@@ -45,6 +56,7 @@ class AutoClickAccessibilityService : AccessibilityService() {
 
     fun scheduleClicks() {
         handler.removeCallbacks(clickRunnable)
+        clickPrimaryNext = true
         handler.post(clickRunnable)
     }
 

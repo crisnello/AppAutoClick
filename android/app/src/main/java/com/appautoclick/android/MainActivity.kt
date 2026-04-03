@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var preferences: AutoClickPreferences
-    private var awaitingPointSelection: Boolean = false
+    private var pendingSelectionTarget: PointTarget = PointTarget.NONE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,11 +24,13 @@ class MainActivity : AppCompatActivity() {
         preferences = AutoClickPreferences(this)
 
         val statusText = findViewById<TextView>(R.id.statusText)
-        val fixedPointText = findViewById<TextView>(R.id.fixedPointText)
+        val primaryPointText = findViewById<TextView>(R.id.primaryPointText)
+        val secondaryPointText = findViewById<TextView>(R.id.secondaryPointText)
         val runningSwitch = findViewById<Switch>(R.id.runningSwitch)
         val intervalGroup = findViewById<RadioGroup>(R.id.intervalGroup)
-        val savePointButton = findViewById<Button>(R.id.savePointButton)
-        val clearPointButton = findViewById<Button>(R.id.clearPointButton)
+        val savePrimaryPointButton = findViewById<Button>(R.id.savePrimaryPointButton)
+        val saveSecondaryPointButton = findViewById<Button>(R.id.saveSecondaryPointButton)
+        val clearPointsButton = findViewById<Button>(R.id.clearPointsButton)
         val openAccessibilityButton = findViewById<Button>(R.id.openAccessibilityButton)
 
         runningSwitch.isChecked = preferences.isRunning()
@@ -54,9 +56,14 @@ class MainActivity : AppCompatActivity() {
         fun refreshUi() {
             val running = preferences.isRunning()
             statusText.text = if (running) getString(R.string.status_running) else getString(R.string.status_stopped)
-            val fixedPoint = preferences.getClickPoint()
-            fixedPointText.text = fixedPoint?.let { "Ponto fixo: (${it.first.toInt()}, ${it.second.toInt()})" }
-                ?: getString(R.string.point_dynamic)
+            val primaryPoint = preferences.getPrimaryClickPoint()
+            val secondaryPoint = preferences.getSecondaryClickPoint()
+            primaryPointText.text = primaryPoint?.let {
+                getString(R.string.point_primary_saved, it.first.toInt(), it.second.toInt())
+            } ?: getString(R.string.point_primary_missing)
+            secondaryPointText.text = secondaryPoint?.let {
+                getString(R.string.point_secondary_saved, it.first.toInt(), it.second.toInt())
+            } ?: getString(R.string.point_secondary_missing)
             runningSwitch.isChecked = running
         }
 
@@ -82,13 +89,18 @@ class MainActivity : AppCompatActivity() {
             preferences.setIntervalOptionId(checkedId)
         }
 
-        savePointButton.setOnClickListener {
-            awaitingPointSelection = true
-            statusText.text = getString(R.string.tap_instruction)
+        savePrimaryPointButton.setOnClickListener {
+            pendingSelectionTarget = PointTarget.PRIMARY
+            statusText.text = getString(R.string.tap_instruction_primary)
         }
 
-        clearPointButton.setOnClickListener {
-            preferences.clearClickPoint()
+        saveSecondaryPointButton.setOnClickListener {
+            pendingSelectionTarget = PointTarget.SECONDARY
+            statusText.text = getString(R.string.tap_instruction_secondary)
+        }
+
+        clearPointsButton.setOnClickListener {
+            preferences.clearClickPoints()
             refreshUi()
         }
 
@@ -98,13 +110,23 @@ class MainActivity : AppCompatActivity() {
 
         val root = findViewById<View>(R.id.rootLayout)
         root.setOnTouchListener { _, event ->
-            if (awaitingPointSelection && event.action == MotionEvent.ACTION_DOWN) {
-                preferences.setClickPoint(event.rawX, event.rawY)
-                awaitingPointSelection = false
-                refreshUi()
-                true
-            } else {
-                false
+            if (event.action != MotionEvent.ACTION_DOWN) {
+                return@setOnTouchListener false
+            }
+            when (pendingSelectionTarget) {
+                PointTarget.PRIMARY -> {
+                    preferences.setPrimaryClickPoint(event.rawX, event.rawY)
+                    pendingSelectionTarget = PointTarget.NONE
+                    refreshUi()
+                    true
+                }
+                PointTarget.SECONDARY -> {
+                    preferences.setSecondaryClickPoint(event.rawX, event.rawY)
+                    pendingSelectionTarget = PointTarget.NONE
+                    refreshUi()
+                    true
+                }
+                PointTarget.NONE -> false
             }
         }
 
@@ -127,5 +149,11 @@ class MainActivity : AppCompatActivity() {
         if (!enabled) {
             statusText.text = getString(R.string.enable_accessibility_hint)
         }
+    }
+
+    private enum class PointTarget {
+        NONE,
+        PRIMARY,
+        SECONDARY
     }
 }
